@@ -42,6 +42,9 @@ public class LeaseContract extends Contract {
         this.expectEndingValue = expectEndingValue;
     }
 
+
+
+
     /**
      * Getters
      */
