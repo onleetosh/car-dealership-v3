@@ -1,4 +1,4 @@
-package com.onleetosh.pluralsight;
+package com.onleetosh.pluralsight.test;
 
 import com.onleetosh.pluralsight.util.Calculation;
 import com.onleetosh.pluralsight.util.Console;
@@ -7,13 +7,10 @@ import com.onleetosh.pluralsight.util.Console;
 public class test2 {
 
 
-
-
         public static void main(String[] args) {
 
 
             while (true) {
-                // Given values (prompt for price input)
                 double price = Console.PromptForDouble("\n\nEntering price.. ");
                 double leasingFee = price * 0.07;  // 7% of the original price
                 double endValue = price * 0.5;  // 50% of the original price

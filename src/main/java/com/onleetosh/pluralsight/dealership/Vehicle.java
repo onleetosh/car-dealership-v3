@@ -1,4 +1,4 @@
-package com.onleetosh.pluralsight;
+package com.onleetosh.pluralsight.dealership;
 
 import com.onleetosh.pluralsight.util.ColorCodes;
 import com.onleetosh.pluralsight.util.Console;
@@ -81,10 +81,14 @@ public class Vehicle {
             colorString = ColorCodes.YELLOW + color + ColorCodes.RESET;
         else if (color.equalsIgnoreCase("Green"))
             colorString = ColorCodes.GREEN + color + ColorCodes.RESET;
+        else if (color.equalsIgnoreCase("Gray"))
+            colorString = ColorCodes.WHITE + color + ColorCodes.RESET;
+        else if (color.equalsIgnoreCase("Black"))
+            colorString = ColorCodes.BLACK + color + ColorCodes.RESET;
         else
             colorString = color;
 
-        return String.format(" %5d | %5d | %10s | %10s | %7s | %15s | %8d | $%3.2f ",
+        return String.format(" %5d | %5d | %10s | %15s | %10s | %15s | %8d | $%3.2f ",
                 this.vin,
                 this.year,
                 this.make,
@@ -94,7 +98,6 @@ public class Vehicle {
                 this.odometer,
                 this.price
         );
-        //return vin + " | " + year + " | " + make + " | " + model + " | " + vehicleType + " | " + colorString + " | " + odometer + " | $" + price;
 
     }
 }

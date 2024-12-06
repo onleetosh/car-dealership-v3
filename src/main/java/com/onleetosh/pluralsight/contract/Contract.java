@@ -1,6 +1,6 @@
 package com.onleetosh.pluralsight.contract;
 
-import com.onleetosh.pluralsight.Vehicle;
+import com.onleetosh.pluralsight.dealership.Vehicle;
 
 import java.util.ArrayList;
 

@@ -1,13 +1,14 @@
 package com.onleetosh.pluralsight.datamanager;
-import com.onleetosh.pluralsight.Vehicle;
 
+
+import com.onleetosh.pluralsight.dealership.*;
+import com.onleetosh.pluralsight.util.*;
 import com.onleetosh.pluralsight.contract.*;
-import com.onleetosh.pluralsight.util.Console;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 public class DataManager {
 
@@ -19,54 +20,14 @@ public class DataManager {
         this.dataSource = dataSource;
     }
 
-    public static void main(String[] args) {
 
+    public List<Dealership> getDealershipFromDatabase(){
 
-
-
-        System.out.println("\nOptions " +
-                "\n 1) View Lease Contracts " +
-                "\n 2) View Sales Contracts ");
-
-       int command = Console.PromptForInt("\n Enter 1 or 2");
-
-
-        if (command == 1) {
-
-            try (BasicDataSource dataSource = getConfiguredDataSource(args)) {
-                DataManager dm = new DataManager(dataSource);
-                List<LeaseContract> leaseContracts = dm.fetchLeaseContracts();
-                if (!leaseContracts.isEmpty()) {
-                    for (LeaseContract lease : leaseContracts) {
-                        System.out.println(lease);
-                    }
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Database error: ", e);
-            }
-        }
-
-        if(command == 2) {
-
-            try (BasicDataSource dataSource = getConfiguredDataSource(args)) {
-                DataManager dm = new DataManager(dataSource);
-                List<SalesContract> salesContracts = dm.fetchSalesContracts();
-                if (!salesContracts.isEmpty()) {
-                    for (SalesContract sales : salesContracts) {
-                        System.out.println(sales);
-                    }
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("Database error: ", e);
-            }
-
-        }
-
-
+        return null;
     }
 
 
-    public static BasicDataSource getConfiguredDataSource(String[] args){
+    public static BasicDataSource processConfiguredDataSource(String[] args){
         if (args.length != 3) {
             System.out.println(
                     "Application needs three arguments to run: " +
@@ -87,21 +48,10 @@ public class DataManager {
     }
 
 
-    public List<LeaseContract> fetchLeaseContracts() {
+    public List<LeaseContract> getLeaseContractsFromDatabase() {
         List<LeaseContract> contracts = new ArrayList<>();
 
-        String query = """
-                SELECT
-                    LeaseContract.LeaseDate,
-                    Vehicle.Vin, Vehicle.Year, Vehicle.Make, Vehicle.Model, Vehicle.VehicleType, Vehicle.Color, Vehicle.Odometer, Vehicle.Price,
-                    CONCAT(Customer.FirstName, ' ', Customer.LastName) AS name,
-                    Customer.Email,
-                    LeaseContract.LeaseContractExpectedFinalValue AS EndValue,
-                    LeaseContract.LeaseContractLeaseFee AS LeaseFee
-                FROM LeaseContract
-                JOIN Customer ON LeaseContract.CustomerID = Customer.CustomerID
-                JOIN Vehicle ON LeaseContract.Vin = Vehicle.Vin;
-                """;
+        String query = SQL.queryLeaseContract();
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(query);
@@ -122,9 +72,9 @@ public class DataManager {
 
                 // Create LeaseContract object
                 contracts.add(new LeaseContract(
-                        results.getString("LeaseDate"),
+                        results.getString("date"),
                         results.getString("name"),
-                        results.getString("Email"),
+                        results.getString("email"),
                         vehicle,
                         results.getDouble("EndValue"),
                         results.getDouble("LeaseFee")
@@ -136,24 +86,10 @@ public class DataManager {
 
         return contracts;
     }
-
-    public List<SalesContract> fetchSalesContracts() {
+    public List<SalesContract> getSalesContractsFromDatabase() {
         List<SalesContract> contracts= new ArrayList<>();
 
-        String query = """
-                SELECT
-                    SalesContract.SalesDate,
-                    Vehicle.Vin, Vehicle.Year, Vehicle.Make, Vehicle.Model, Vehicle.VehicleType, Vehicle.Color, Vehicle.Odometer, Vehicle.Price,
-                    CONCAT(Customer.FirstName, ' ', Customer.LastName) AS name,
-                    Customer.Email,
-                    SalesContract.SalesContractTaxes AS tax,
-                    SalesContract.SalesContractRecordingFee AS recording,
-                    SalesContract.SalesContractProcessingFee AS processing,
-                    SalesContract.isFinance as finance
-                FROM SalesContract
-                JOIN Customer ON SalesContract.CustomerID = Customer.CustomerID
-                JOIN Vehicle ON SalesContract.Vin = Vehicle.Vin;
-                """;
+        String query = SQL.querySalesContract();
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(query);
@@ -173,18 +109,18 @@ public class DataManager {
                 );
 
                 // Create LeaseContract object
-               contracts.add(new SalesContract(
-                       results.getString("SalesDate"),
-                       results.getString("name"),
-                       results.getString("Email"),
-                       vehicle,
-                       results.getDouble("tax"),
-                       results.getDouble("recording"),
-                       results.getDouble("processing"),
-                       results.getBoolean("finance")
+                contracts.add(new SalesContract(
+                        results.getString("date"),
+                        results.getString("name"),
+                        results.getString("email"),
+                        vehicle,
+                        results.getDouble("tax"),
+                        results.getDouble("recording"),
+                        results.getDouble("processing"),
+                        results.getBoolean("finance")
 
 
-                       ));
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error fetching sales contracts: ", e);
@@ -192,6 +128,248 @@ public class DataManager {
 
         return contracts;
     }
+
+    // TODO: change name to processColorRequest()
+
+    public List<Vehicle> getVehicleFromDatabaseByColor(String value) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+
+        //do the stuff with the datasource here...
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByColor());)
+            {
+                ps.setString(1, value);
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public  List<Vehicle> getVehicleFromDatabaseByVehicleType(String value) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+
+        //do the stuff with the datasource here...
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByType());)
+            {
+                ps.setString(1, value);
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public  List<Vehicle> getVehicleFromDatabaseByMakeModel(String value) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByMakeModel());)
+            {
+                ps.setString(1, value);
+
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public   List<Vehicle> getVehicleFromDatabaseByPriceRange(double min, double max) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByPriceRange());)
+            {
+                ps.setDouble(1, min);
+                ps.setDouble(2, max);
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public   List<Vehicle> getVehicleFromDatabaseByYear(int min, int max) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+
+        //do the stuff with the datasource here...
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByYear());)
+            {
+                ps.setInt(1, min);
+                ps.setInt(2, max);
+
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public   List<Vehicle> getVehicleFromDatabaseByMileage(int min, int max) {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryVehicleByMileage());)
+            {
+                ps.setInt(1, min);
+                ps.setInt(1, max);
+
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    public  List<Vehicle> getAllVehicleFromDatabase() {
+        ArrayList<Vehicle> vehicle = new ArrayList<>();
+
+        //do the stuff with the datasource here...
+
+        try(Connection connection = dataSource.getConnection();){
+            try(PreparedStatement ps = connection.prepareStatement(
+                    SQL.queryAllVehicles());)
+            {
+                try(ResultSet results = ps.executeQuery())
+                {
+                    //loop and return all results
+                    while(results.next()){
+                        vehicle.add( new Vehicle(
+                                results.getInt(1),
+                                results.getInt(2),
+                                results.getString(3),
+                                results.getString(4),
+                                results.getString(5),
+                                results.getString(6),
+                                results.getInt(7),
+                                results.getDouble(8)
+
+                        ));
+                    }
+                }
+            }
+            return vehicle;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
 
 

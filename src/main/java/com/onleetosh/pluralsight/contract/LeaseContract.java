@@ -1,6 +1,6 @@
 package com.onleetosh.pluralsight.contract;
 
-import com.onleetosh.pluralsight.Vehicle;
+import com.onleetosh.pluralsight.dealership.*;
 import com.onleetosh.pluralsight.util.*;
 
 public class LeaseContract extends Contract {
@@ -44,7 +44,6 @@ public class LeaseContract extends Contract {
 
 
 
-
     /**
      * Getters
      */
@@ -67,39 +66,6 @@ public class LeaseContract extends Contract {
     public void setExpectEndingValue(double expectEndingValue) {
         this.expectEndingValue = expectEndingValue;
     }
-
-    /*
-    public void processLeaseContract(){
-        String date = Console.PromptForString("Enter date (MM-dd-YYYY): ");
-        String name = Console.PromptForString("Enter your name" );
-        String email = Console.PromptForString("Enter e-mail address: ");
-
-        System.out.println("Vehicle being Leased.");
-        int vin = Console.PromptForInt("Enter Vin: ");
-        int year = Console.PromptForInt("Enter year: ");
-        String make = Console.PromptForString("Enter make: ");
-        String model = Console.PromptForString("Enter model: ");
-        String vehicleType = Console.PromptForString("Enter vehicle type: ");
-        String color = Console.PromptForString("Enter color:  ");
-        int odometer = Console.PromptForInt("Enter odometer: ");
-        double price = Console.PromptForDouble("Enter price: ");
-        Vehicle vehicleSold = new Vehicle(vin,year, make, model, vehicleType, color, odometer, price);
-
-        double totalPrice = Console.PromptForDouble("Enter total price: ");
-        double monthlyPayment = Console.PromptForDouble("Enter monthly payment: ");
-        double expectEndValue = Console.PromptForDouble("Expect end value");
-        double leaseFee = Console.PromptForDouble("");
-        LeaseContract newLease = new LeaseContract(date,
-                name,
-                email,
-                vehicleSold,
-                totalPrice,
-                monthlyPayment,
-                expectEndValue,
-                leaseFee);
-    }
-
-     */
 
     /**
      * Override to calculate and return the value amount for total price and monthly payment

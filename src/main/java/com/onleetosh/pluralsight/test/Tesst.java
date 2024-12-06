@@ -1,6 +1,5 @@
-package com.onleetosh.pluralsight;
+package com.onleetosh.pluralsight.test;
 
-import com.onleetosh.pluralsight.util.Calculation;
 import com.onleetosh.pluralsight.util.Console;
 
 import static com.onleetosh.pluralsight.util.Calculation.calculateLoanPayment;

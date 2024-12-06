@@ -1,6 +1,6 @@
-package com.onleetosh.pluralsight;
+package com.onleetosh.pluralsight.dealership;
 
-import com.onleetosh.pluralsight.util.Console;
+import com.onleetosh.pluralsight.util.*;
 
 import java.util.ArrayList;
 
@@ -9,6 +9,7 @@ public class Dealership {
     private String name;
     private String address;
     private String phone;
+    private int dealershipID;
 
     private ArrayList<Vehicle> inventory;
 
@@ -30,6 +31,7 @@ public class Dealership {
     public String getPhone() {
         return phone;
     }
+
 
     public ArrayList<Vehicle> getInventory() {
         return inventory;
@@ -106,6 +108,16 @@ public class Dealership {
     public ArrayList<Vehicle> getVehicleByColor(String color){
         ArrayList<Vehicle> result = new ArrayList<>();
         for (Vehicle vehicle : inventory){
+            if(vehicle.getColor().equalsIgnoreCase(color)) {
+                result.add(vehicle);
+            }
+        }
+        return result;
+    }
+    public ArrayList<Vehicle> getVehicleFromDBColor(String color){
+        ArrayList<Vehicle> result = new ArrayList<>();
+        for (Vehicle vehicle : inventory){
+
             if(vehicle.getColor().equalsIgnoreCase(color)) {
                 result.add(vehicle);
             }
